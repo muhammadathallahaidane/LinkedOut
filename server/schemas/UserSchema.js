@@ -20,22 +20,28 @@ export const userTypeDefs = `#graphql
     createUser(newUser: CreateUserInput): String
   }
 
-    type Query {
-        books: [Posts]
-    }`;
+  type Query {
+    createToken(username: String, password: String): String
+  }`;
 
 export const userResolvers = {
   Query: {
-    books: () => books,
+    createToken: async function(_, args) {
+      const {
+        username,
+        password
+      } = args
+
+      const message = await UserModel.login(username, password)
+      return message
+    }
   },
   Mutation: {
     createUser: async function (_, args) {
       const { newUser } = args;
       // Here you would typically call a function to save the user to your database
       // For now, we will just return a success message
-      console.log("TEST >>>>>>>>>>>>>>");
-
-      const message = await UserModel.insert(newUser);
+      const message = await UserModel.register(newUser);
       return message;
     },
   },

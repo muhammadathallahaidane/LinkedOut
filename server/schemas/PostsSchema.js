@@ -45,7 +45,7 @@ export const postsResolvers = {
         // For now, we will just return a success message
         console.log("TEST >>>>>>>>>>>>>>");
         
-        const message = await UserModel.insert(newUser);
+        const message = await UserModel.register(newUser);
         return message
     }
   }
