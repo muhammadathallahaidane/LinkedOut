@@ -12,7 +12,9 @@
   "type": "module",
   "dependencies": {
     "@apollo/server": "^4.12.2",
+    "bcryptjs": "^3.0.2",
     "dotenv": "^16.5.0",
+    "email-validator": "^2.0.4",
     "graphql": "^16.11.0",
     "mongodb": "6.17"
   }
