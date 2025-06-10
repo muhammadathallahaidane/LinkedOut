@@ -18,7 +18,7 @@ export const followTypeDefs = `#graphql
   }
 
   type Mutation {
-    followUser(payload: CreateUserInput): String
+    followUser(payload: CreateFollow): String
   }`
 
 export const followResolvers = {
@@ -27,9 +27,13 @@ export const followResolvers = {
   },
   Mutation: {
     followUser: async function(_, args, contextValue) {
-      const {_id} = contextValue.authN()
+      const {id} = contextValue.authN()
+      if (!id) {
+        throw new Error("Unauthorized");
+        
+      }
       const { payload } = args
-      const message = await FollowModel.followUser(_id, payload)
+      const message = await FollowModel.followUser(id, payload)
       return message
     }
   }
