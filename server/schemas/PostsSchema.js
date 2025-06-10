@@ -30,11 +30,6 @@ export const postsTypeDefs = `#graphql
     content: String
     tags: [String]
     imgUrl: String
-    authorId: ID
-    comments: [Comments]
-    likes: [Likes]
-    createdAt: String
-    updatedAt: String
   }
 
   type Mutation {

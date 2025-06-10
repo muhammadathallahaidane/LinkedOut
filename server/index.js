@@ -21,10 +21,11 @@ const { url } = await startStandaloneServer(server, {
         }
         
         const token = req.headers.authorization.split(" ")[1]
-        let payload = jwt.verify(token, process.env.JWT_SECRET)
-        if (!payload) {
+        if (!token) {
           throw new Error("Unauthorized")
         }
+
+        let payload = jwt.verify(token, process.env.JWT_SECRET)
         return payload
       }
     }
