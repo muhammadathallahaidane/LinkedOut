@@ -37,7 +37,11 @@ export const userResolvers = {
       return token
     },
     search: async function(_, args, contextValue) {
-   
+      const { _id } = contextValue.authN()
+      if (!_id) {
+        throw new Error("Unauthorized");
+      }
+      
       const { name, username } = args
       const message = await UserModel.search(name, username)
       return message
