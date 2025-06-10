@@ -12,6 +12,10 @@ export default class UserModel {
     return collection;
   }
 
+  static async findById(id) {
+    const user = await this.getCollection().findOne({})
+  }
+
   static async register(payload) {
     let errorMessage = "";
     const emailUser = await this.getCollection().findOne({
@@ -63,11 +67,44 @@ export default class UserModel {
     }
 
     let payload = {
-      username,
-      password,
+      id: findUser._id,
+      username: findUser.username,
     };
+
     let token = jwt.sign(payload, process.env.JWT_SECRET);
 
     return token;
+  }
+
+  static async search(name, username) {
+    const searchCriteria = [];
+
+    if (name) {
+      searchCriteria.push({ name: { $regex: name, $options: "i" } });
+    }
+
+    if (username) {
+      searchCriteria.push({ username: { $regex: username, $options: "i" } });
+    }
+
+    if (searchCriteria.length === 0) {
+      throw new Error("Please provide name or username to search");
+    }
+
+    const users = await this.getCollection()
+      .find({
+        $or: searchCriteria,
+      })
+      .toArray();
+
+    if (users.length === 0) {
+      throw new Error("No users found matching the search criteria");
+    }
+
+    // Remove password from results for security
+    return users.map((user) => {
+      const { password, ...userWithoutPassword } = user;
+      return userWithoutPassword;
+    });
   }
 }

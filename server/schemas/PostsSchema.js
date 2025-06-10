@@ -26,13 +26,24 @@ export const postsTypeDefs = `#graphql
     updatedAt: String
   }
 
-  type Mutation {
-    createUser(newUser: CreateUserInput): String
+  input CreatePostInput {
+    content: String
+    tags: [String]
+    imgUrl: String
+    authorId: ID
+    comments: [Comments]
+    likes: [Likes]
+    createdAt: String
+    updatedAt: String
   }
 
-    type Query {
-        books: [Posts]
-    }`
+  type Mutation {
+    createPosts(newUser: CreateUserInput): String
+  }
+
+  type Query {
+    books: [Posts]
+  }`
 
 export const postsResolvers = {
   Query: {

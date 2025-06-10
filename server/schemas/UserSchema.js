@@ -16,23 +16,30 @@ export const userTypeDefs = `#graphql
     password: String
  }
 
-  type Mutation {
-    createUser(newUser: CreateUserInput): String
+  type Query {
+    login(username: String, password: String): String
+    search(name: String, username: String): [User]
   }
 
-  type Query {
-    createToken(username: String, password: String): String
+  type Mutation {
+    createUser(newUser: CreateUserInput): String
   }`;
 
 export const userResolvers = {
   Query: {
-    createToken: async function(_, args) {
+    login: async function(_, args) {
       const {
         username,
         password
       } = args
 
-      const message = await UserModel.login(username, password)
+      const token = await UserModel.login(username, password)
+      return token
+    },
+    search: async function(_, args, contextValue) {
+   
+      const { name, username } = args
+      const message = await UserModel.search(name, username)
       return message
     }
   },
