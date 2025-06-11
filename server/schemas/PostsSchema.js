@@ -23,20 +23,20 @@ export const postsTypeDefs = `#graphql
   }
 
   type Likes {
-    username: String
+    username: String!
     createdAt: String
     updatedAt: String
   }
 
   input CreatePostInput {
-    content: String
+    content: String!
     tags: [String]
     imgUrl: String
   }
 
   type Mutation {
     createPosts(newPost: CreatePostInput): Post
-    addComment(postId: ID, content: String): String
+    addComment(postId: ID, content: String!): String
     addLike(postId: ID): String
   }
 

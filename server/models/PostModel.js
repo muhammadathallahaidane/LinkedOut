@@ -12,6 +12,14 @@ export default class PostModel {
   static async createPosts(payload) {
     const { content, tags, imgUrl, comments, likes, id } = payload;
 
+    if (!content) {
+      throw new Error("Content required");
+    }
+
+    if (!id) {
+      throw new Error("Author ID required")
+    }
+
     const newPost = {
       content,
       tags,
@@ -90,6 +98,14 @@ export default class PostModel {
   }
 
   static async addComment(postId, username, content) {
+    if (!content) {
+      throw new Error("Content required")
+    }
+
+    if (!username) {
+      throw new Error("Username required")
+    }
+
     await this.getCollection().updateOne(
       { _id: new ObjectId(postId) },
       {
@@ -107,6 +123,11 @@ export default class PostModel {
   }
 
   static async addLike(postId, username) {
+    if (!username) {
+      throw new Error("Username required")
+    }
+
+
     const postExists = await this.getCollection().findOne({
       _id: new ObjectId(postId),
     });
@@ -136,6 +157,6 @@ export default class PostModel {
         },
       }
     );
-    return "Post has been liked";
+    return "Post liked!";
   }
 }

@@ -12,9 +12,9 @@ export const userTypeDefs = `#graphql
 
   input CreateUserInput {
     name: String
-    username: String
-    email: String
-    password: String
+    username: String!
+    email: String!
+    password: String!
  }
 
   type Query {
