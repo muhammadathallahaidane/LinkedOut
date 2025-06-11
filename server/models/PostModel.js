@@ -62,12 +62,12 @@ export default class PostModel {
       throw new Error("Post not found");
     }
 
-    return post[0]
+    return post[0];
   }
 
   static async findAll() {
     const post = await this.getCollection()
-    .aggregate([
+      .aggregate([
         {
           $lookup: {
             from: "users",
@@ -86,35 +86,56 @@ export default class PostModel {
       ])
       .toArray();
 
-      return post
+    return post;
   }
 
   static async addComment(postId, username, content) {
     await this.getCollection().updateOne(
-      {_id: new ObjectId(postId)},
-      {$push: {
-        comments: {
-          content,
-          username,
-          createdAt: new Date(),
-          updatedAt: new Date()
-        }
-      }}
-    )
-    return "Comment added succesfully"
+      { _id: new ObjectId(postId) },
+      {
+        $push: {
+          comments: {
+            content,
+            username,
+            createdAt: new Date(),
+            updatedAt: new Date(),
+          },
+        },
+      }
+    );
+    return "Comment added succesfully";
   }
 
   static async addLike(postId, username) {
+    const postExists = await this.getCollection().findOne({
+      _id: new ObjectId(postId),
+    });
+
+    if (!postExists) {
+      throw new Error("Post not found");
+    }
+    
+    const alreadyLike = await this.getCollection().findOne({
+      "likes.username": username,
+    });
+
+    if (alreadyLike) {
+      throw new Error("You have already liked this post");
+    }
+
+
     await this.getCollection().updateOne(
-      {_id: new ObjectId(postId)},
-      {$push: {
-        likes: {
-          username,
-          createdAt: new Date(),
-          updatedAt: new Date()
-        }
-      }}
-    )
-    return "Post has been liked"
+      { _id: new ObjectId(postId) },
+      {
+        $push: {
+          likes: {
+            username,
+            createdAt: new Date(),
+            updatedAt: new Date(),
+          },
+        },
+      }
+    );
+    return "Post has been liked";
   }
 }
