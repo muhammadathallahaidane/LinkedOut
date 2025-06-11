@@ -88,4 +88,33 @@ export default class PostModel {
 
       return post
   }
+
+  static async addComment(postId, username, content) {
+    await this.getCollection().updateOne(
+      {_id: new ObjectId(postId)},
+      {$push: {
+        comments: {
+          content,
+          username,
+          createdAt: new Date(),
+          updatedAt: new Date()
+        }
+      }}
+    )
+    return "Comment added succesfully"
+  }
+
+  static async addLike(postId, username) {
+    await this.getCollection().updateOne(
+      {_id: new ObjectId(postId)},
+      {$push: {
+        likes: {
+          username,
+          createdAt: new Date(),
+          updatedAt: new Date()
+        }
+      }}
+    )
+    return "Post has been liked"
+  }
 }

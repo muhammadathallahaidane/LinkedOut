@@ -11,6 +11,7 @@ export const postsTypeDefs = `#graphql
     likes: [Likes]
     createdAt: String
     updatedAt: String
+    authorData: [User]
   }
 
   type Comments {
@@ -34,6 +35,8 @@ export const postsTypeDefs = `#graphql
 
   type Mutation {
     createPosts(newPost: CreatePostInput): Post
+    addComment(postId: ID, content: String): String
+    addLike(postId: ID): String
   }
 
   type Query {
@@ -60,8 +63,8 @@ export const postsResolvers = {
         throw new Error("Unauthorized");
       }
 
-      const post = await PostModel.findAll()
-      return post
+      const post = await PostModel.findAll();
+      return post;
     },
   },
   Mutation: {
@@ -83,5 +86,27 @@ export const postsResolvers = {
 
       return posts;
     },
+    addComment: async function (_, args, contextValue) {
+      const { id, username } = contextValue.authN();
+      if (!id) {
+        throw new Error("Unauthorized");
+      }
+
+      const { postId, content } = args;
+
+      const message = await PostModel.addComment(postId, username, content)
+      return message
+    },
+    addLike: async function (_, args, contextValue) {
+      const { id, username } = contextValue.authN();
+      if (!id) {
+        throw new Error("Unauthorized");
+      }
+
+      const { postId } = args
+
+      const message = await PostModel.addLike(postId, username)
+      return message
+    }
   },
 };
