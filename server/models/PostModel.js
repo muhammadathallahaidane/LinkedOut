@@ -64,4 +64,28 @@ export default class PostModel {
 
     return post[0]
   }
+
+  static async findAll() {
+    const post = await this.getCollection()
+    .aggregate([
+        {
+          $lookup: {
+            from: "users",
+            localField: "authorId",
+            foreignField: "_id",
+            as: "authorData",
+          },
+        },
+        {
+          $project: {
+            "authorData._id": 0,
+            "authorData.email": 0,
+            "authorData.password": 0,
+          },
+        },
+      ])
+      .toArray();
+
+      return post
+  }
 }

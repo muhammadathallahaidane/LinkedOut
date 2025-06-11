@@ -38,24 +38,34 @@ export const postsTypeDefs = `#graphql
 
   type Query {
     getPost(id: ID): Post
+    getAllPost: [Post]
   }`;
 
 export const postsResolvers = {
   Query: {
-    getPost: async function(_, args, contextValue) {
-        const { id: loginId } = contextValue.authN()
-        if (!loginId) {
-          throw new Error("Unauthorized")
-        }
+    getPost: async function (_, args, contextValue) {
+      const { id: loginId } = contextValue.authN();
+      if (!loginId) {
+        throw new Error("Unauthorized");
+      }
 
-        const { id } = args
+      const { id } = args;
 
-        const post = await PostModel.findById(id)
-        return post
+      const post = await PostModel.findById(id);
+      return post;
+    },
+    getAllPost: async function (_, _args, contextValue) {
+      const { id: loginId } = contextValue.authN();
+      if (!loginId) {
+        throw new Error("Unauthorized");
+      }
+
+      const post = await PostModel.findAll()
+      return post
     },
   },
   Mutation: {
-    createPosts: async function(_, args, contextValue) {
+    createPosts: async function (_, args, contextValue) {
       const { id } = contextValue.authN();
       if (!id) {
         throw new Error("Unauthorized");
