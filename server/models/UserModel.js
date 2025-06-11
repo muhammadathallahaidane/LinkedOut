@@ -13,7 +13,60 @@ export default class UserModel {
   }
 
   static async findById(id) {
-    const user = await this.getCollection().findOne({})
+    const user = await this.getCollection()
+      .aggregate([
+        {
+          $match: {
+            _id: new ObjectId(id)
+          }
+        },
+        {
+          $lookup: {
+            from: "follows",
+            localField: "_id",
+            foreignField: "followingId",
+            as: "followersData",
+          },
+        },
+        {
+          $lookup: {
+            from: "follows",
+            localField: "_id",
+            foreignField: "followerId",
+            as: "followingsData",
+          },
+        },
+        {
+          $lookup: {
+            from: "users",
+            localField: "followersData.followerId",
+            foreignField: "_id",
+            as: "followers",
+          },
+        },
+        {
+          $lookup: {
+            from: "users",
+            localField: "followingsData.followingId",
+            foreignField: "_id",
+            as: "followings",
+          },
+        },
+        {
+          $project: {
+            followersData: 0,
+            followingsData: 0,
+            password: 0,
+            "followers.password": 0,
+            "followings.password": 0,
+          },
+        },
+      ])
+      .toArray();
+    if (user.length < 1) {
+      throw new Error("User not found");
+    }
+    return user[0];
   }
 
   static async register(payload) {

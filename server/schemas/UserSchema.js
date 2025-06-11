@@ -6,7 +6,8 @@ export const userTypeDefs = `#graphql
     name: String
     username: String
     email: String
-    password: String
+    followers: [User]
+    followings: [User]
   }
 
   input CreateUserInput {
@@ -19,6 +20,7 @@ export const userTypeDefs = `#graphql
   type Query {
     login(username: String, password: String): String
     search(name: String, username: String): [User]
+    getUser(id: ID): User
   }
 
   type Mutation {
@@ -27,25 +29,32 @@ export const userTypeDefs = `#graphql
 
 export const userResolvers = {
   Query: {
-    login: async function(_, args) {
-      const {
-        username,
-        password
-      } = args
+    login: async function (_, args) {
+      const { username, password } = args;
 
-      const token = await UserModel.login(username, password)
-      return token
+      const token = await UserModel.login(username, password);
+      return token;
     },
-    search: async function(_, args, contextValue) {
-      const { id } = contextValue.authN()
+    search: async function (_, args, contextValue) {
+      const { id } = contextValue.authN();
       if (!id) {
         throw new Error("Unauthorized");
       }
 
-      const { name, username } = args
-      const message = await UserModel.search(name, username)
-      return message
-    }
+      const { name, username } = args;
+      const message = await UserModel.search(name, username);
+      return message;
+    },
+    getUser: async function (_, args, contextValue) {
+      const { id: loginId } = contextValue.authN();
+      if (!loginId) {
+        throw new Error("Unauthorized");
+      }
+
+      const { id } = args
+      const user = await UserModel.findById(id)
+      return user
+    },
   },
   Mutation: {
     createUser: async function (_, args) {

@@ -13,24 +13,30 @@ export default class FollowModel {
   }
 
   static async followUser(id, payload) {
-    const follower = await this.getCollection().findOne({
-      _id: new ObjectId(id),
+    const followerId = id
+    const followingId = payload.followingId
+    
+    const alreadyFollow = await this.getCollection().findOne({
+      followerId,
+      followingId
     });
-    if (!follower) {
-      throw new Error("User not found");
-    }
-    const following = await this.getCollection().findOne({
-      _id: new ObjectId(payload.followingId),
-    });
-    if (!following) {
-      throw new Error("User not found");
+
+    if (alreadyFollow) {
+      throw new Error("You are already following this user");
     }
 
+    if (followerId === followingId) {
+      throw new Error("You cannot follow yourself");
+    }
+
+
     await this.getCollection().insertOne({
-      followerId: new ObjectId(id),
-      followingId: new ObjectId(payload.followingId)
-    })
-   
-    return "User followed successfully"
+      followerId: new ObjectId(followerId),
+      followingId: new ObjectId(followingId),
+      createdAt: new Date(),
+      updatedAt: new Date()
+    });
+
+    return "User followed successfully";
   }
 }
