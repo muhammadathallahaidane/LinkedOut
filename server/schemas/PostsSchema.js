@@ -1,4 +1,5 @@
 import PostModel from "../models/PostModel.js";
+import redis from "../config/redis.js"
 
 export const postsTypeDefs = `#graphql
  type Post {
@@ -63,8 +64,16 @@ export const postsResolvers = {
         throw new Error("Unauthorized");
       }
 
-      const post = await PostModel.findAll();
-      return post;
+      const cache = await redis.get("posts")
+      if (cache) {
+        const posts = JSON.parse(cache)
+        return posts
+      }
+
+      const posts = await PostModel.findAll();
+      await redis.set("posts", JSON.stringify(posts))
+
+      return posts;
     },
   },
   Mutation: {
@@ -83,6 +92,8 @@ export const postsResolvers = {
         likes: [],
         id,
       });
+
+      await redis.del("posts")
 
       return posts;
     },
