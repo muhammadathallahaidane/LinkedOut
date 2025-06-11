@@ -1,7 +1,7 @@
-import UserModel from "../models/UserModel.js";
+import PostModel from "../models/PostModel.js";
 
 export const postsTypeDefs = `#graphql
- type Posts {
+ type Post {
     _id: ID
     content: String
     tags: [String]
@@ -33,26 +33,45 @@ export const postsTypeDefs = `#graphql
   }
 
   type Mutation {
-    createPosts(newUser: CreateUserInput): String
+    createPosts(newPost: CreatePostInput): Post
   }
 
   type Query {
-    books: [Posts]
-  }`
+    getPost(id: ID): Post
+  }`;
 
 export const postsResolvers = {
   Query: {
-    books: () => books,
+    getPost: async function(_, args, contextValue) {
+        const { id: loginId } = contextValue.authN()
+        if (!loginId) {
+          throw new Error("Unauthorized")
+        }
+
+        const { id } = args
+
+        const post = await PostModel.findById(id)
+        return post
+    },
   },
   Mutation: {
-    createUser: async function(_, args) {
-        const { newUser } = args
-        // Here you would typically call a function to save the user to your database
-        // For now, we will just return a success message
-        console.log("TEST >>>>>>>>>>>>>>");
-        
-        const message = await UserModel.register(newUser);
-        return message
-    }
-  }
+    createPosts: async function(_, args, contextValue) {
+      const { id } = contextValue.authN();
+      if (!id) {
+        throw new Error("Unauthorized");
+      }
+      const { content, tags, imgUrl } = args.newPost;
+
+      const posts = await PostModel.createPosts({
+        content,
+        tags,
+        imgUrl,
+        comments: [],
+        likes: [],
+        id,
+      });
+
+      return posts;
+    },
+  },
 };

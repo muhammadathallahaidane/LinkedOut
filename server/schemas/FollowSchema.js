@@ -14,7 +14,7 @@ export const followTypeDefs = `#graphql
  }
  
   type Query {
-    books: [Posts]
+    test: String
   }
 
   type Mutation {
@@ -23,7 +23,7 @@ export const followTypeDefs = `#graphql
 
 export const followResolvers = {
   Query: {
-    books: () => books,
+    test: () => {},
   },
   Mutation: {
     followUser: async function(_, args, contextValue) {
