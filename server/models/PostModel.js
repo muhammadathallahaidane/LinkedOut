@@ -28,7 +28,40 @@ export default class PostModel {
 
     return {
       id: post.insertedId,
-      ...newPost
+      ...newPost,
     };
+  }
+
+  static async findById(id) {
+    const post = await this.getCollection()
+      .aggregate([
+        {
+          $match: {
+            _id: new ObjectId(id),
+          },
+        },
+        {
+          $lookup: {
+            from: "users",
+            localField: "authorId",
+            foreignField: "_id",
+            as: "authorData",
+          },
+        },
+        {
+          $project: {
+            "authorData._id": 0,
+            "authorData.email": 0,
+            "authorData.password": 0,
+          },
+        },
+      ])
+      .toArray();
+
+    if (post.length < 1) {
+      throw new Error("Post not found");
+    }
+
+    return post[0]
   }
 }
