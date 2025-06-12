@@ -8,11 +8,12 @@ import jwt from "jsonwebtoken"
 
 const server = new ApolloServer({
   typeDefs: [userTypeDefs, postsTypeDefs, followTypeDefs],
-  resolvers: [userResolvers, postsResolvers, followResolvers]
+  resolvers: [userResolvers, postsResolvers, followResolvers],
+  introspection: true,
 });
 
 const { url } = await startStandaloneServer(server, {
-  listen: { port: 3000 },
+  listen: { port: process.env.PORT || 3000 },
   context: async function ({req, res}) {
     return {
       authN: function() {
