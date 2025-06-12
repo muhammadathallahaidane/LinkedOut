@@ -19,7 +19,7 @@ export const userTypeDefs = `#graphql
 
   type Query {
     login(username: String, password: String): String
-    search(name: String, username: String): [User]
+    search(keyword: String): [User]
     getUser(id: ID): User
   }
 
@@ -41,9 +41,9 @@ export const userResolvers = {
         throw new Error("Unauthorized");
       }
 
-      const { name, username } = args;
-      const message = await UserModel.search(name, username);
-      return message;
+      const { keyword } = args;
+      const users = await UserModel.search(keyword);
+      return users;
     },
     getUser: async function (_, args, contextValue) {
       const { id: loginId } = contextValue.authN();
