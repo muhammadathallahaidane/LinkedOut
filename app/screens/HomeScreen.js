@@ -1,18 +1,14 @@
 import { useNavigation } from "@react-navigation/native";
 import { Button, StyleSheet, Text, View } from "react-native";
 
-export default function LoginScreen() {
+export default function HomeScreen() {
   const navigation = useNavigation();
   return (
     <View style={styles.container}>
-      <Text>Ini Login Screen</Text>
+      <Text>Ini Home Screen</Text>
       <Button
         title="Register"
         onPress={() => navigation.navigate("RegisterScreen")}
-      />
-      <Button
-        title="Home"
-        onPress={() => navigation.navigate("HomeNavigator")}
       />
     </View>
   );
