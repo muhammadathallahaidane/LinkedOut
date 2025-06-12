@@ -91,6 +91,7 @@ export default class PostModel {
             "authorData.password": 0,
           },
         },
+        { $sort: { createdAt: -1 } }
       ])
       .toArray();
 
@@ -137,6 +138,7 @@ export default class PostModel {
     }
     
     const alreadyLike = await this.getCollection().findOne({
+      _id: new ObjectId(postId),
       "likes.username": username,
     });
 
