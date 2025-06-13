@@ -12,7 +12,7 @@ import {
 } from "react-native";
 import AuthContext from "../contexts/AuthContext";
 import * as SecureStore from "expo-secure-store";
-import { gql, useQuery } from "@apollo/client";
+import { gql, useQuery, useMutation } from "@apollo/client";
 
 export const GET_ALL_POSTS = gql`
   query GetAllPost {
@@ -44,14 +44,30 @@ export const GET_ALL_POSTS = gql`
   }
 `;
 
+const ADD_LIKE = gql`
+  mutation AddLike($postId: ID) {
+    addLike(postId: $postId)
+  }
+`;
+
 export default function HomeScreen() {
   const navigation = useNavigation();
   const authContext = useContext(AuthContext);
-  const { loading, data, error } = useQuery(GET_ALL_POSTS, {
+  
+  const { loading, data, error, refetch } = useQuery(GET_ALL_POSTS, {
     onError: (error) => {
       Alert.alert("Error", error.message);
     },
   });
+
+const [addLike] = useMutation(ADD_LIKE, {
+  refetchQueries: [
+    { query: GET_ALL_POSTS }
+  ],
+  onError: (error) => {
+    Alert.alert("Error", error.message);
+  },
+});
 
   // Handle loading state
   if (loading) {
@@ -138,6 +154,10 @@ export default function HomeScreen() {
           postTitle: post.content.substring(0, 50) + (post.content.length > 50 ? '...' : '')
         }
       });
+    };    const handleLikePress = (event) => {
+      event.stopPropagation(); // Prevent triggering post card press
+      // Add like - server will handle duplicate prevention
+      addLike({ variables: { postId: post._id } });
     };
 
     return (
@@ -194,11 +214,13 @@ export default function HomeScreen() {
             {likesCount > 0 && commentsCount > 0 && " • "}
             {commentsCount > 0 && `${commentsCount} comments`}
           </Text>
-        </View>
-
-        {/* Action Buttons */}
+        </View>        {/* Action Buttons */}
         <View style={styles.actionButtons}>
-          <TouchableOpacity style={styles.actionButton}>
+          <TouchableOpacity 
+            style={styles.actionButton} 
+            onPress={handleLikePress}
+            activeOpacity={0.7}
+          >
             <Text style={styles.actionIcon}>👍</Text>
             <Text style={styles.actionText}>Like</Text>
           </TouchableOpacity>
@@ -207,7 +229,8 @@ export default function HomeScreen() {
             <Text style={styles.actionIcon}>💬</Text>
             <Text style={styles.actionText}>Comment</Text>
           </TouchableOpacity>
-            <TouchableOpacity style={styles.actionButton}>
+          
+          <TouchableOpacity style={styles.actionButton}>
             <Text style={styles.actionIcon}>📤</Text>
             <Text style={styles.actionText}>Share</Text>
           </TouchableOpacity>

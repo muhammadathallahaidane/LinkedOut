@@ -1,4 +1,4 @@
-import { gql, useQuery } from "@apollo/client";
+import { gql, useQuery, useMutation } from "@apollo/client";
 import { 
   StyleSheet, 
   Text, 
@@ -8,9 +8,13 @@ import {
   Image,
   SafeAreaView,
   Alert,
-  FlatList
+  FlatList,
+  TextInput,
+  KeyboardAvoidingView,
+  Platform
 } from "react-native";
-import { useContext } from "react";
+import { useContext, useState } from "react";
+import { GET_ALL_POSTS } from "./HomeScreen";
 import AuthContext from "../contexts/AuthContext";
 
 const GET_POST = gql`
@@ -42,11 +46,24 @@ const GET_POST = gql`
   }
 `;
 
+const ADD_COMMENT = gql`
+  mutation AddComment($content: String!, $postId: ID) {
+    addComment(content: $content, postId: $postId)
+  }
+`;
+
+const ADD_LIKE = gql`
+  mutation AddLike($postId: ID) {
+    addLike(postId: $postId)
+  }
+`;
+
 export default function PostDetailScreen({ route }) {
   const { postId, postTitle } = route.params;
   const authContext = useContext(AuthContext);
+  const [commentText, setCommentText] = useState("");
 
-  const { loading, data, error } = useQuery(GET_POST, {
+  const { loading, data, error, refetch } = useQuery(GET_POST, {
     variables: {
       getPostId: postId
     },
@@ -54,6 +71,25 @@ export default function PostDetailScreen({ route }) {
       Alert.alert("Error", error.message);
     }
   });
+  const [addComment, { loading: commentLoading }] = useMutation(ADD_COMMENT, {
+    onCompleted: () => {
+      setCommentText("");
+      refetch(); // Refresh the post data to show new comment
+      Alert.alert("Success", "Comment added successfully!");
+    },
+    onError: (error) => {
+      Alert.alert("Error", error.message);
+    }
+  });
+
+const [addLike] = useMutation(ADD_LIKE, {
+  refetchQueries: [
+    { query: GET_ALL_POSTS }
+  ],
+  onError: (error) => {
+    Alert.alert("Error", error.message);
+  },
+});
 
   if (loading) {
     return (
@@ -117,11 +153,28 @@ export default function PostDetailScreen({ route }) {
     if (diff < 0) {
       return "now";
     }
-    
-    if (days > 0) return `${days}d`;
+      if (days > 0) return `${days}d`;
     if (hours > 0) return `${hours}h`;
     if (minutes > 0) return `${minutes}m`;
     return "now";
+  };
+  const handleAddComment = () => {
+    if (!commentText.trim()) {
+      Alert.alert("Error", "Please enter a comment");
+      return;
+    }
+
+    addComment({
+      variables: {
+        content: commentText.trim(),
+        postId: postId
+      }
+    });
+  };
+
+  const handleLikePress = () => {
+    // Add like - server will handle duplicate prevention
+    addLike({ variables: { postId: postId } });
   };
 
   const renderComment = ({ item }) => (
@@ -140,12 +193,15 @@ export default function PostDetailScreen({ route }) {
       </View>
     </View>
   );
-
   return (
     <SafeAreaView style={styles.container}>
-      <ScrollView showsVerticalScrollIndicator={false}>
-        {/* Post Header */}
-        <View style={styles.postHeader}>
+      <KeyboardAvoidingView 
+        style={styles.keyboardAvoidingView}
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      >
+        <ScrollView showsVerticalScrollIndicator={false}>
+          {/* Post Header */}
+          <View style={styles.postHeader}>
           <View style={styles.authorInfo}>
             <View style={styles.avatar}>
               <Text style={styles.avatarText}>
@@ -188,11 +244,13 @@ export default function PostDetailScreen({ route }) {
             {likesCount > 0 && commentsCount > 0 && " • "}
             {commentsCount > 0 && `${commentsCount} comments`}
           </Text>
-        </View>
-
-        {/* Action Buttons */}
+        </View>        {/* Action Buttons */}
         <View style={styles.actionButtons}>
-          <TouchableOpacity style={styles.actionButton}>
+          <TouchableOpacity 
+            style={styles.actionButton}
+            onPress={handleLikePress}
+            activeOpacity={0.7}
+          >
             <Text style={styles.actionIcon}>👍</Text>
             <Text style={styles.actionText}>Like</Text>
           </TouchableOpacity>
@@ -206,9 +264,7 @@ export default function PostDetailScreen({ route }) {
             <Text style={styles.actionIcon}>📤</Text>
             <Text style={styles.actionText}>Share</Text>
           </TouchableOpacity>
-        </View>
-
-        {/* Comments Section */}
+        </View>        {/* Comments Section */}
         <View style={styles.commentsSection}>
           <Text style={styles.sectionTitle}>Comments ({commentsCount})</Text>
           {post.comments && post.comments.length > 0 ? (
@@ -222,19 +278,47 @@ export default function PostDetailScreen({ route }) {
           ) : (
             <Text style={styles.emptyText}>No comments yet</Text>
           )}
-        </View>
-
-        {/* Bottom Spacing */}
+          
+          {/* Add Comment Input */}
+          <View style={styles.addCommentSection}>
+            <View style={styles.addCommentContainer}>
+              <View style={styles.commentInputAvatar}>
+                <Text style={styles.commentInputAvatarText}>Y</Text>
+              </View>
+              <TextInput
+                style={styles.commentInput}
+                placeholder="Write a comment..."
+                placeholderTextColor="#999"
+                value={commentText}
+                onChangeText={setCommentText}
+                multiline
+                maxLength={500}
+              />
+              <TouchableOpacity 
+                style={[styles.postCommentButton, (!commentText.trim() || commentLoading) && styles.postCommentButtonDisabled]}
+                onPress={handleAddComment}
+                disabled={!commentText.trim() || commentLoading}
+              >
+                <Text style={[styles.postCommentButtonText, (!commentText.trim() || commentLoading) && styles.postCommentButtonTextDisabled]}>
+                  {commentLoading ? "..." : "Post"}
+                </Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>        {/* Bottom Spacing */}
         <View style={styles.bottomSpacing} />
       </ScrollView>
+      </KeyboardAvoidingView>
     </SafeAreaView>
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
+const styles = StyleSheet.create({  container: {
     flex: 1,
     backgroundColor: "#f3f2ef",
+  },
+  keyboardAvoidingView: {
+    flex: 1,
   },
   loadingContainer: {
     flex: 1,
@@ -420,13 +504,70 @@ const styles = StyleSheet.create({
     fontSize: 14,
     lineHeight: 20,
     color: "#333",
-  },
-  emptyText: {
+  },  emptyText: {
     fontSize: 14,
     color: "#666",
     textAlign: "center",
     fontStyle: "italic",
     paddingVertical: 20,
+  },
+  addCommentSection: {
+    marginTop: 16,
+    paddingTop: 16,
+    borderTopWidth: 1,
+    borderTopColor: "#f0f0f0",
+  },
+  addCommentContainer: {
+    flexDirection: "row",
+    alignItems: "flex-start",
+    paddingHorizontal: 4,
+  },
+  commentInputAvatar: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: "#0077b5",
+    justifyContent: "center",
+    alignItems: "center",
+    marginRight: 12,
+    marginTop: 4,
+  },
+  commentInputAvatarText: {
+    color: "white",
+    fontSize: 12,
+    fontWeight: "bold",
+  },
+  commentInput: {
+    flex: 1,
+    borderWidth: 1,
+    borderColor: "#e0e0e0",
+    borderRadius: 20,
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    fontSize: 14,
+    backgroundColor: "#f9f9f9",
+    marginRight: 8,
+    maxHeight: 80,
+  },
+  postCommentButton: {
+    backgroundColor: "#0077b5",
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    borderRadius: 20,
+    justifyContent: "center",
+    alignItems: "center",
+    marginTop: 4,
+  },
+  postCommentButtonDisabled: {
+    backgroundColor: "#b0b0b0",
+  },
+  postCommentButtonText: {
+    color: "white",
+    fontSize: 14,
+    fontWeight: "600",
+  },
+  postCommentButtonTextDisabled: {
+    color: "#ccc",
   },
   bottomSpacing: {
     height: 20,
