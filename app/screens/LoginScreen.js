@@ -1,7 +1,7 @@
 import { gql, useLazyQuery } from "@apollo/client";
 import { useNavigation } from "@react-navigation/native";
 import { useContext, useState } from "react";
-import { Button, StyleSheet, Text, TextInput, View } from "react-native";
+import { Alert, Button, StyleSheet, Text, TextInput, View } from "react-native";
 import * as SecureStore from "expo-secure-store";
 import AuthContext from "../contexts/AuthContext";
 
@@ -13,7 +13,7 @@ const LOGIN = gql`
 
 export default function LoginScreen() {
   const navigation = useNavigation();
-  const authContext = useContext(AuthContext)
+  const authContext = useContext(AuthContext);
   const [input, setInput] = useState({
     username: "",
     password: "",
@@ -21,7 +21,10 @@ export default function LoginScreen() {
   const [loginQuery, { loading, data, error }] = useLazyQuery(LOGIN, {
     onCompleted: async function (result) {
       await SecureStore.setItemAsync("access_token", result.login);
-      authContext.setIsLoggedIn(true)
+      authContext.setIsLoggedIn(true);
+    },
+    onError: (error) => {
+      Alert.alert(JSON.stringify(error.message));
     },
   });
 
@@ -31,20 +34,14 @@ export default function LoginScreen() {
         <Text>loading...</Text>
       </View>
     );
-  if (error)
-    return (
-      <View>
-        <Text>error... {error.message}</Text>
-      </View>
-    );
 
   function handleLogin() {
     loginQuery({
       variables: {
         username: input.username,
-        password: input.password
-      }
-    })
+        password: input.password,
+      },
+    });
   }
 
   return (
@@ -82,10 +79,7 @@ export default function LoginScreen() {
         }
       />
       <View style={{ width: 200, marginTop: 100 }}>
-        <Button
-          title="Login"
-          onPress={handleLogin}
-        />
+        <Button title="Login" onPress={handleLogin} />
       </View>
     </View>
   );

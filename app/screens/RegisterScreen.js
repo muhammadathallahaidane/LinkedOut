@@ -1,7 +1,7 @@
 import { gql, useMutation } from "@apollo/client";
 import { useNavigation } from "@react-navigation/native";
 import { useState } from "react";
-import { Button, StyleSheet, Text, TextInput, View } from "react-native";
+import { Alert, Button, StyleSheet, Text, TextInput, View } from "react-native";
 
 const REGISTER = gql`
   mutation CreateUser($newUser: CreateUserInput) {
@@ -22,18 +22,15 @@ export default function RegisterScreen() {
     onCompleted: (result) => {
       navigation.navigate("LoginScreen");
     },
+    onError: (error) => {
+      Alert.alert(JSON.stringify(error.message))
+    }
   });
 
   if (loading)
     return (
       <View>
         <Text>loading...</Text>
-      </View>
-    );
-  if (error)
-    return (
-      <View>
-        <Text>error... {error.message}</Text>
       </View>
     );
 
@@ -52,7 +49,6 @@ export default function RegisterScreen() {
 
   return (
     <View style={styles.container}>
-      <Text>Register</Text>
       <Button
         title="Login"
         onPress={() => navigation.navigate("LoginScreen")}
