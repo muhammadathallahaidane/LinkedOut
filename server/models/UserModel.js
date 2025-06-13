@@ -109,6 +109,19 @@ export default class UserModel {
   }
 
   static async login(username, password) {
+    if (!username && !password) {
+      throw new Error("Please fill the input first");
+      
+    }
+
+    if (!username) {
+      throw new Error("Username cant be empty")
+    }
+
+    if (!password) {
+      throw new Error("Password cant be empty")
+    }
+
     const findUser = await this.getCollection().findOne({ username: username });
     if (!findUser) {
       throw new Error("User not found");
