@@ -42,21 +42,10 @@ export default function RegisterScreen() {
     onError: (error) => {
       Alert.alert("Registration Failed", error.message);
     }
-  });
-
-  const handleRegister = () => {
+  });  const handleRegister = () => {
+    // Basic client-side validation (minimal)
     if (!input.email.trim() || !input.name.trim() || !input.password.trim() || !input.username.trim()) {
       Alert.alert("Error", "Please fill in all fields");
-      return;
-    }
-
-    if (!input.email.includes('@')) {
-      Alert.alert("Error", "Please enter a valid email address");
-      return;
-    }
-
-    if (input.password.length < 6) {
-      Alert.alert("Error", "Password must be at least 6 characters long");
       return;
     }
 
@@ -182,7 +171,7 @@ export default function RegisterScreen() {
                   </Text>
                 </TouchableOpacity>
               </View>
-              <Text style={styles.passwordHint}>Password must be at least 6 characters</Text>
+              <Text style={styles.passwordHint}>Choose a strong password</Text>
             </View>
 
             {/* Terms and Conditions */}

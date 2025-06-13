@@ -10,6 +10,7 @@ import {
   View,
   SafeAreaView,
 } from "react-native";
+import { MaterialIcons, Ionicons, FontAwesome } from '@expo/vector-icons';
 import AuthContext from "../contexts/AuthContext";
 import * as SecureStore from "expo-secure-store";
 import { gql, useQuery, useMutation } from "@apollo/client";
@@ -100,7 +101,9 @@ const [addLike] = useMutation(ADD_LIKE, {
   async function handleLogout() {
     await SecureStore.deleteItemAsync("access_token");
     authContext.setIsLoggedIn(false);
-  }  const formatTime = (dateString) => {
+  }
+
+  const formatTime = (dateString) => {
     if (!dateString) {
       return "now";
     }
@@ -140,7 +143,10 @@ const [addLike] = useMutation(ADD_LIKE, {
     if (days > 0) return `${days}d`;
     if (hours > 0) return `${hours}h`;
     if (minutes > 0) return `${minutes}m`;
-    return "now";  };  const renderPost = (post) => {
+    return "now";
+  };
+
+  const renderPost = (post) => {
     const author = post.authorData[0];
     const authorName = author?.name || author?.username || "Unknown";
     const likesCount = post.likes?.length || 0;
@@ -154,7 +160,9 @@ const [addLike] = useMutation(ADD_LIKE, {
           postTitle: post.content.substring(0, 50) + (post.content.length > 50 ? '...' : '')
         }
       });
-    };    const handleLikePress = (event) => {
+    };
+
+    const handleLikePress = (event) => {
       event.stopPropagation(); // Prevent triggering post card press
       // Add like - server will handle duplicate prevention
       addLike({ variables: { postId: post._id } });
@@ -179,10 +187,9 @@ const [addLike] = useMutation(ADD_LIKE, {
               <Text style={styles.postTime}>{formatTime(post.createdAt)}</Text>
             </View>
           </View>
-          
-          {/* More Options */}
+            {/* More Options */}
           <TouchableOpacity style={styles.moreButton}>
-            <Text style={styles.moreText}>⋯</Text>
+            <MaterialIcons name="more-horiz" size={24} color="#666" />
           </TouchableOpacity>
         </View>
 
@@ -210,28 +217,35 @@ const [addLike] = useMutation(ADD_LIKE, {
         {/* Engagement Stats */}
         <View style={styles.engagementStats}>
           <Text style={styles.statsText}>
-            {likesCount > 0 && `${likesCount} likes`}
-            {likesCount > 0 && commentsCount > 0 && " • "}
-            {commentsCount > 0 && `${commentsCount} comments`}
+            {likesCount > 0 && commentsCount > 0 
+              ? `${likesCount} likes • ${commentsCount} comments`
+              : likesCount > 0 
+                ? `${likesCount} likes`
+                : commentsCount > 0 
+                  ? `${commentsCount} comments`
+                  : ''
+            }
           </Text>
-        </View>        {/* Action Buttons */}
+        </View>
+
+        {/* Action Buttons */}
         <View style={styles.actionButtons}>
           <TouchableOpacity 
             style={styles.actionButton} 
             onPress={handleLikePress}
             activeOpacity={0.7}
           >
-            <Text style={styles.actionIcon}>👍</Text>
+            <MaterialIcons name="thumb-up" size={18} color="#666" />
             <Text style={styles.actionText}>Like</Text>
           </TouchableOpacity>
           
           <TouchableOpacity style={styles.actionButton}>
-            <Text style={styles.actionIcon}>💬</Text>
+            <MaterialIcons name="comment" size={18} color="#666" />
             <Text style={styles.actionText}>Comment</Text>
           </TouchableOpacity>
           
           <TouchableOpacity style={styles.actionButton}>
-            <Text style={styles.actionIcon}>📤</Text>
+            <MaterialIcons name="share" size={18} color="#666" />
             <Text style={styles.actionText}>Share</Text>
           </TouchableOpacity>
         </View>
@@ -265,17 +279,18 @@ const [addLike] = useMutation(ADD_LIKE, {
             </View>
             <Text style={styles.createPostText}>Start a post...</Text>
           </View>
+
           <View style={styles.createPostActions}>
             <TouchableOpacity style={styles.createAction}>
-              <Text style={styles.createActionIcon}>📷</Text>
+              <MaterialIcons name="photo-camera" size={20} color="#666" />
               <Text style={styles.createActionText}>Photo</Text>
             </TouchableOpacity>
             <TouchableOpacity style={styles.createAction}>
-              <Text style={styles.createActionIcon}>🎥</Text>
+              <MaterialIcons name="videocam" size={20} color="#666" />
               <Text style={styles.createActionText}>Video</Text>
             </TouchableOpacity>
             <TouchableOpacity style={styles.createAction}>
-              <Text style={styles.createActionIcon}>📝</Text>
+              <MaterialIcons name="article" size={20} color="#666" />
               <Text style={styles.createActionText}>Article</Text>
             </TouchableOpacity>
           </View>
@@ -403,14 +418,11 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
     paddingHorizontal: 12,
   },
-  createActionIcon: {
-    fontSize: 16,
-    marginRight: 6,
-  },
   createActionText: {
     fontSize: 14,
     color: "#666",
     fontWeight: "500",
+    marginLeft: 6,
   },
 
   // Post Card Styles
@@ -471,10 +483,6 @@ const styles = StyleSheet.create({
   moreButton: {
     padding: 4,
   },
-  moreText: {
-    fontSize: 20,
-    color: "#666",
-  },
 
   // Post Content
   postContent: {
@@ -528,13 +536,10 @@ const styles = StyleSheet.create({
     alignItems: "center",
     paddingVertical: 8,
   },
-  actionIcon: {
-    fontSize: 16,
-    marginRight: 6,
-  },
   actionText: {
     fontSize: 14,
     color: "#666",
     fontWeight: "500",
+    marginLeft: 6,
   },
 });

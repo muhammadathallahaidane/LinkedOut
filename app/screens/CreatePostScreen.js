@@ -1,20 +1,20 @@
 import { gql, useMutation } from "@apollo/client";
 import { useNavigation } from "@react-navigation/native";
 import { useState, useContext } from "react";
-import { 
+import {
   Alert,
   TouchableOpacity,
-  StyleSheet, 
-  Text, 
-  TextInput, 
-  View, 
+  StyleSheet,
+  Text,
+  TextInput,
+  View,
   SafeAreaView,
   ScrollView,
   Keyboard,
-  TouchableWithoutFeedback
+  TouchableWithoutFeedback,
 } from "react-native";
 import AuthContext from "../contexts/AuthContext";
-import {GET_ALL_POSTS} from "./HomeScreen";
+import { GET_ALL_POSTS } from "./HomeScreen";
 
 const CREATE_POST = gql`
   mutation CreatePosts($newPost: CreatePostInput) {
@@ -64,8 +64,8 @@ export default function CreatePostScreen() {
       Alert.alert("Success", "Post created successfully!", [
         {
           text: "OK",
-          onPress: () => navigation.goBack()
-        }
+          onPress: () => navigation.goBack(),
+        },
       ]);
     },
     onError: (error) => {
@@ -99,7 +99,7 @@ export default function CreatePostScreen() {
     if (currentTag.trim() && !input.tags.includes(currentTag.trim())) {
       setInput({
         ...input,
-        tags: [...input.tags, currentTag.trim()]
+        tags: [...input.tags, currentTag.trim()],
       });
       setCurrentTag("");
     }
@@ -108,7 +108,7 @@ export default function CreatePostScreen() {
   const removeTag = (tagToRemove) => {
     setInput({
       ...input,
-      tags: input.tags.filter(tag => tag !== tagToRemove)
+      tags: input.tags.filter((tag) => tag !== tagToRemove),
     });
   };
 
@@ -122,22 +122,36 @@ export default function CreatePostScreen() {
         <View style={styles.innerContainer}>
           {/* Header */}
           <View style={styles.header}>
-            <TouchableOpacity onPress={handleCancel} style={styles.cancelButton}>
+            <TouchableOpacity
+              onPress={handleCancel}
+              style={styles.cancelButton}
+            >
               <Text style={styles.cancelText}>Cancel</Text>
             </TouchableOpacity>
             <Text style={styles.headerTitle}>Create post</Text>
-            <TouchableOpacity 
-              onPress={handlePost} 
-              style={[styles.postButton, isPostDisabled && styles.postButtonDisabled]}
+            <TouchableOpacity
+              onPress={handlePost}
+              style={[
+                styles.postButton,
+                isPostDisabled && styles.postButtonDisabled,
+              ]}
               disabled={isPostDisabled}
             >
-              <Text style={[styles.postButtonText, isPostDisabled && styles.postButtonTextDisabled]}>
+              <Text
+                style={[
+                  styles.postButtonText,
+                  isPostDisabled && styles.postButtonTextDisabled,
+                ]}
+              >
                 {loading ? "Posting..." : "Post"}
               </Text>
             </TouchableOpacity>
           </View>
 
-          <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
+          <ScrollView
+            style={styles.content}
+            showsVerticalScrollIndicator={false}
+          >
             {/* Author Info */}
             <View style={styles.authorSection}>
               <View style={styles.avatar}>
@@ -207,13 +221,18 @@ export default function CreatePostScreen() {
                 {input.tags.map((tag, index) => (
                   <View key={index} style={styles.tag}>
                     <Text style={styles.tagText}>{tag}</Text>
-                    <TouchableOpacity onPress={() => removeTag(tag)} style={styles.removeTagButton}>
+                    <TouchableOpacity
+                      onPress={() => removeTag(tag)}
+                      style={styles.removeTagButton}
+                    >
                       <Text style={styles.removeTagButtonText}>x</Text>
                     </TouchableOpacity>
                   </View>
                 ))}
               </View>
-              <Text style={styles.tagsHint}>Separate multiple tags with commas</Text>
+              <Text style={styles.tagsHint}>
+                Separate multiple tags with commas
+              </Text>
             </View>
 
             {/* Bottom Spacing */}

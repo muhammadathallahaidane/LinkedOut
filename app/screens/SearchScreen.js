@@ -9,6 +9,7 @@ import {
   View,
   TouchableOpacity,
   Image,
+  SafeAreaView,
 } from "react-native";
 import AuthContext from "../contexts/AuthContext";
 import { gql, useLazyQuery } from "@apollo/client";
@@ -84,9 +85,8 @@ const handleUserPress = (user) => {
     }
   });
 };
-
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
       {/* Header */}
       <View style={styles.header}>
         <Text style={styles.headerTitle}>Search People</Text>
@@ -169,9 +169,9 @@ const handleUserPress = (user) => {
                     </View>
                   </View>
 
-                  <TouchableOpacity style={styles.connectButton}>
+                  {/* <TouchableOpacity style={styles.connectButton}>
                     <Text style={styles.connectButtonText}>Connect</Text>
-                  </TouchableOpacity>
+                  </TouchableOpacity> */}
                 </TouchableOpacity>
               ))}
             </ScrollView>
@@ -189,10 +189,9 @@ const handleUserPress = (user) => {
             <Text style={styles.emptyStateSubtext}>
               Enter a name or username to find people
             </Text>
-          </View>
-        )}
+          </View>        )}
       </View>
-    </View>
+    </SafeAreaView>
   );
 }
 
@@ -207,7 +206,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     padding: 20,
     backgroundColor: "#0077b5", // LinkedIn blue
-    paddingTop: 50, // For status bar
   },
   headerTitle: {
     fontSize: 20,
@@ -339,17 +337,6 @@ const styles = StyleSheet.create({
   stats: {
     fontSize: 12,
     color: "#888",
-  },
-  connectButton: {
-    backgroundColor: "#0077b5",
-    paddingHorizontal: 20,
-    paddingVertical: 10,
-    borderRadius: 20,
-  },
-  connectButtonText: {
-    color: "white",
-    fontSize: 14,
-    fontWeight: "600",
   },
   emptyState: {
     flex: 1,

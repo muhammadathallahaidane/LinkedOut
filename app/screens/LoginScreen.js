@@ -128,11 +128,6 @@ export default function LoginScreen() {
               </View>
             </View>
 
-            {/* Forgot Password */}
-            <TouchableOpacity style={styles.forgotPasswordContainer}>
-              <Text style={styles.forgotPasswordText}>Forgot password?</Text>
-            </TouchableOpacity>
-
             {/* Login Button */}
             <TouchableOpacity 
               style={[styles.loginButton, loading && styles.loginButtonDisabled]}
@@ -142,24 +137,6 @@ export default function LoginScreen() {
               <Text style={styles.loginButtonText}>
                 {loading ? "Signing in..." : "Sign in"}
               </Text>
-            </TouchableOpacity>
-
-            {/* Divider */}
-            <View style={styles.dividerContainer}>
-              <View style={styles.dividerLine} />
-              <Text style={styles.dividerText}>or</Text>
-              <View style={styles.dividerLine} />
-            </View>
-
-            {/* Social Login Buttons */}
-            <TouchableOpacity style={styles.socialButton}>
-              <Text style={styles.socialButtonIcon}>🔵</Text>
-              <Text style={styles.socialButtonText}>Continue with Google</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity style={styles.socialButton}>
-              <Text style={styles.socialButtonIcon}>📘</Text>
-              <Text style={styles.socialButtonText}>Continue with Facebook</Text>
             </TouchableOpacity>
           </View>
 

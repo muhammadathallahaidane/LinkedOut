@@ -1,5 +1,5 @@
 // import { StatusBar } from "expo-status-bar";
-import { StyleSheet, Text, View } from "react-native";
+import { StyleSheet, Text, View, StatusBar } from "react-native";
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import LoginScreen from "./screens/LoginScreen";
@@ -33,8 +33,10 @@ export default function App() {
       value={{
         isLoggedIn,
         setIsLoggedIn,
+        user: { username: "currentUser" }, // Add user context for isLiked functionality
       }}
     >
+      <StatusBar barStyle="dark-content" backgroundColor="#f3f2ef" translucent={false}/>
       <ApolloProvider client={client}>
         <NavigationContainer>
           <Stack.Navigator>
