@@ -106,6 +106,7 @@ export const postsResolvers = {
       const { postId, content } = args;
 
       const message = await PostModel.addComment(postId, username, content)
+      await redis.del("posts")
       return message
     },
     addLike: async function (_, args, contextValue) {
@@ -117,6 +118,7 @@ export const postsResolvers = {
       const { postId } = args
 
       const message = await PostModel.addLike(postId, username)
+      await redis.del("posts")
       return message
     }
   },
