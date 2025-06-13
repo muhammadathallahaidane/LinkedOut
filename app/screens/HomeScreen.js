@@ -84,28 +84,64 @@ export default function HomeScreen() {
   async function handleLogout() {
     await SecureStore.deleteItemAsync("access_token");
     authContext.setIsLoggedIn(false);
-  }
+  }  const formatTime = (dateString) => {
+    if (!dateString) {
+      return "now";
+    }
 
-  const formatTime = (dateString) => {
-    const date = new Date(dateString);
+    let date;
+    
+    // Handle Unix timestamp (string of numbers)
+    if (/^\d+$/.test(dateString.toString())) {
+      const timestamp = parseInt(dateString);
+      // Check if it's in seconds (10 digits) or milliseconds (13 digits)
+      if (timestamp.toString().length === 10) {
+        // Unix timestamp in seconds, convert to milliseconds
+        date = new Date(timestamp * 1000);
+      } else {
+        // Already in milliseconds
+        date = new Date(timestamp);
+      }
+    } else {
+      date = new Date(dateString);
+    }
+    
+    if (isNaN(date.getTime())) {
+      return "now";
+    }
+
     const now = new Date();
     const diff = now - date;
+    
+    const minutes = Math.floor(diff / (1000 * 60));
     const hours = Math.floor(diff / (1000 * 60 * 60));
     const days = Math.floor(hours / 24);
     
+    if (diff < 0) {
+      return "now";
+    }
+    
     if (days > 0) return `${days}d`;
     if (hours > 0) return `${hours}h`;
-    return "now";
-  };
-
-  const renderPost = (post) => {
+    if (minutes > 0) return `${minutes}m`;
+    return "now";  };  const renderPost = (post) => {
     const author = post.authorData[0];
     const authorName = author?.name || author?.username || "Unknown";
     const likesCount = post.likes?.length || 0;
     const commentsCount = post.comments?.length || 0;
 
+    const handlePostPress = () => {
+      navigation.navigate('UserDetailNavigator', {
+        screen: 'PostDetailScreen',
+        params: {
+          postId: post._id,
+          postTitle: post.content.substring(0, 50) + (post.content.length > 50 ? '...' : '')
+        }
+      });
+    };
+
     return (
-      <View key={post._id} style={styles.postCard}>
+      <TouchableOpacity key={post._id} style={styles.postCard} onPress={handlePostPress} activeOpacity={0.9}>
         {/* Post Header */}
         <View style={styles.postHeader}>
           <View style={styles.authorInfo}>
@@ -171,13 +207,12 @@ export default function HomeScreen() {
             <Text style={styles.actionIcon}>💬</Text>
             <Text style={styles.actionText}>Comment</Text>
           </TouchableOpacity>
-          
-          <TouchableOpacity style={styles.actionButton}>
+            <TouchableOpacity style={styles.actionButton}>
             <Text style={styles.actionIcon}>📤</Text>
             <Text style={styles.actionText}>Share</Text>
           </TouchableOpacity>
         </View>
-      </View>
+      </TouchableOpacity>
     );
   };
 

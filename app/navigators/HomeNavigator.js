@@ -1,6 +1,6 @@
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import HomeScreen from '../screens/HomeScreen';
-import SeachScreen from '../screens/SearchScreen';
+import SearchScreen from '../screens/SearchScreen';
 import CreatePostScreen from '../screens/CreatePostScreen';
 
 const Tab = createBottomTabNavigator();
@@ -15,7 +15,7 @@ export default function HomeNavigator() {
             />
             <Tab.Screen
                 name="SearchScreen"
-                component={SeachScreen}
+                component={SearchScreen}
                 options={{ headerShown: false }}
             />
             <Tab.Screen

@@ -9,6 +9,8 @@ import client from "./config/apollo";
 import { ApolloProvider } from "@apollo/client";
 import AuthContext from "./contexts/AuthContext";
 import { useEffect, useState } from "react";
+import UserDetailNavigator from "./navigators/UserDetailNavigator";
+import * as SecureStore from "expo-secure-store";
 
 const Stack = createNativeStackNavigator();
 
@@ -16,8 +18,8 @@ export default function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   useEffect(() => {
-    tokenValid()
-  }, [])
+    tokenValid();
+  }, []);
 
   async function tokenValid() {
     const token = await SecureStore.getItemAsync("access_token");
@@ -41,6 +43,11 @@ export default function App() {
                 <Stack.Screen
                   name="HomeNavigator"
                   component={HomeNavigator}
+                  options={{ headerShown: false }}
+                />
+                <Stack.Screen
+                  name="UserDetailNavigator"
+                  component={UserDetailNavigator}
                   options={{ headerShown: false }}
                 />
               </>

@@ -42,7 +42,7 @@ export default function SearchScreen() {
   const authContext = useContext(AuthContext);
   const [searchKeyword, setSearchKeyword] = useState("");
   const [searchResults, setSearchResults] = useState([]);
-  
+
   const [searchQuery, { loading, data, error }] = useLazyQuery(SEARCH, {
     onCompleted: (result) => {
       setSearchResults(result.search || []);
@@ -73,6 +73,18 @@ export default function SearchScreen() {
     authContext.setIsLoggedIn(false);
   }
 
+const handleUserPress = (user) => {
+  navigation.navigate('UserDetailNavigator', {
+    screen: 'UserDetailScreen',
+    params: {
+      id: user._id,
+      name: user.name || user.username,
+      username: user.username,
+      email: user.email
+    }
+  });
+};
+
   return (
     <View style={styles.container}>
       {/* Header */}
@@ -94,8 +106,8 @@ export default function SearchScreen() {
           returnKeyType="search"
         />
         <View style={styles.searchButtons}>
-          <TouchableOpacity 
-            style={styles.searchButton} 
+          <TouchableOpacity
+            style={styles.searchButton}
             onPress={handleSearch}
             disabled={loading}
           >
@@ -103,7 +115,7 @@ export default function SearchScreen() {
               {loading ? "Searching..." : "Search"}
             </Text>
           </TouchableOpacity>
-          
+
           {searchKeyword.length > 0 && (
             <TouchableOpacity style={styles.clearButton} onPress={clearSearch}>
               <Text style={styles.clearButtonText}>Clear</Text>
@@ -119,34 +131,44 @@ export default function SearchScreen() {
             <Text style={styles.resultsHeader}>
               {searchResults.length} people found
             </Text>
-            <ScrollView 
+            <ScrollView
               style={styles.scrollView}
               showsVerticalScrollIndicator={false}
               contentContainerStyle={styles.listContainer}
             >
               {searchResults.map((item) => (
-                <TouchableOpacity key={item._id} style={styles.userCard}>
+                <TouchableOpacity
+                  key={item._id}
+                  style={styles.userCard}
+                  onPress={() => handleUserPress(item)} // ← Tambah onPress
+                  activeOpacity={0.7}
+                >
                   <View style={styles.avatarContainer}>
                     {/* Placeholder avatar - bisa diganti dengan gambar user */}
                     <View style={styles.avatar}>
                       <Text style={styles.avatarText}>
-                        {item.name ? item.name.charAt(0).toUpperCase() : item.username.charAt(0).toUpperCase()}
+                        {item.name
+                          ? item.name.charAt(0).toUpperCase()
+                          : item.username.charAt(0).toUpperCase()}
                       </Text>
                     </View>
                   </View>
-                  
+
                   <View style={styles.userInfo}>
-                    <Text style={styles.userName}>{item.name || item.username}</Text>
+                    <Text style={styles.userName}>
+                      {item.name || item.username}
+                    </Text>
                     <Text style={styles.userUsername}>@{item.username}</Text>
                     <Text style={styles.userEmail}>{item.email}</Text>
-                    
+
                     <View style={styles.statsContainer}>
                       <Text style={styles.stats}>
-                        {item.followers?.length || 0} followers • {item.followings?.length || 0} following
+                        {item.followers?.length || 0} followers •{" "}
+                        {item.followings?.length || 0} following
                       </Text>
                     </View>
                   </View>
-                  
+
                   <TouchableOpacity style={styles.connectButton}>
                     <Text style={styles.connectButtonText}>Connect</Text>
                   </TouchableOpacity>
@@ -246,7 +268,8 @@ const styles = StyleSheet.create({
     color: "#666",
     fontSize: 14,
     fontWeight: "500",
-  },  resultsContainer: {
+  },
+  resultsContainer: {
     flex: 1,
     padding: 20,
   },
