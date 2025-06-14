@@ -21,7 +21,8 @@
     "react-native-safe-area-context": "^5.4.1",
     "react-native-screens": "^4.11.1",
     "expo-secure-store": "~14.2.3",
-    "@expo/vector-icons": "^14.1.0"
+    "@expo/vector-icons": "^14.1.0",
+    "expo-updates": "~0.28.14"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0"

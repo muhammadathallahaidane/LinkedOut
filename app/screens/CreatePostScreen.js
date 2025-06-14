@@ -52,21 +52,22 @@ export default function CreatePostScreen() {
     imgUrl: "",
     tags: [],
   });
-  const [currentTag, setCurrentTag] = useState("");
-
-  const [createPost, { loading }] = useMutation(CREATE_POST, {
+  const [currentTag, setCurrentTag] = useState("");  const [createPost, { loading }] = useMutation(CREATE_POST, {
     refetchQueries: [
       {
         query: GET_ALL_POSTS,
       },
     ],
     onCompleted: (result) => {
-      Alert.alert("Success", "Post created successfully!", [
-        {
-          text: "OK",
-          onPress: () => navigation.goBack(),
-        },
-      ]);
+      // Reset form input setelah berhasil post
+      setInput({
+        content: "",
+        imgUrl: "",
+        tags: [],
+      });
+      setCurrentTag("");
+      
+      Alert.alert("Success", "Post created successfully!");
     },
     onError: (error) => {
       Alert.alert("Error", error.message);
@@ -205,7 +206,7 @@ export default function CreatePostScreen() {
               <View style={styles.tagsInputContainer}>
                 <TextInput
                   style={styles.tagsInput}
-                  placeholder="e.g. technology, innovation, career (separate with commas)"
+                  placeholder="e.g. technology, innovation, career"
                   placeholderTextColor="#999"
                   value={currentTag}
                   onChangeText={(text) => {
@@ -230,9 +231,6 @@ export default function CreatePostScreen() {
                   </View>
                 ))}
               </View>
-              <Text style={styles.tagsHint}>
-                Separate multiple tags with commas
-              </Text>
             </View>
 
             {/* Bottom Spacing */}
